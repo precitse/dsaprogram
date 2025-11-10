@@ -6,7 +6,7 @@ def fractional_knapsack(weights, profits, capacity):
     #Calculate profit/weight ratio for each parcel
     ratio = [(profits[i] / weights[i], weights[i], profits[i]) for i in range(len(weights))]
     
-    Sort parcels by ratio (highest profit per weight first)
+    #Sort parcels by ratio (highest profit per weight first)
     ratio.sort(reverse=True, key=lambda x: x[0])
     
     total_profit = 0       # To store total profit
@@ -81,3 +81,4 @@ while True:
         break
     else:
         print("Invalid choice. Try again.")
+
