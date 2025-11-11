@@ -1,124 +1,57 @@
-// Program: Circular Queue using Array
-// Objective: Implement a menu-driven circular queue with enqueue, dequeue, and display operations.
-
 #include <iostream>
 using namespace std;
 
-#define SIZE 5 // Fixed size of the queue
+#define SIZE 5
 
 class CircularQueue {
-    int arr[SIZE];  // Array to store queue elements
-    int front, rear;
-
+    int front, rear, arr[SIZE];
 public:
-    // Constructor to initialize front and rear
-    CircularQueue() {
-        front = -1;
-        rear = -1;
-    }
+    CircularQueue() { front = rear = -1; }
 
-    // Check if the queue is full
-    bool isFull() {
-        return ((front == 0 && rear == SIZE - 1) || (rear + 1 == front));
-    }
-
-    // Check if the queue is empty
-    bool isEmpty() {
-        return (front == -1);
-    }
-
-    // Enqueue operation (Insert)
-    void enqueue(int value) {
-        if (isFull()) {
-            cout << "Queue is FULL! Cannot insert " << value << endl;
-            return;
+    void enqueue(int x) {
+        if ((rear + 1) % SIZE == front) { 
+            cout << "Queue Overflow\n"; 
+            return; 
         }
-
-        if (front == -1)  // First element
-            front = 0;
-
-        rear = (rear + 1) % SIZE;  // Circular increment
-        arr[rear] = value;
-
-        cout << "Inserted: " << value << endl;
+        if (front == -1) front = 0;
+        rear = (rear + 1) % SIZE;
+        arr[rear] = x;
+        cout << x << " inserted\n";
     }
 
-    // Dequeue operation (Delete)
     void dequeue() {
-        if (isEmpty()) {
-            cout << "Queue is EMPTY! Cannot delete." << endl;
-            return;
+        if (front == -1) { 
+            cout << "Queue Underflow\n"; 
+            return; 
         }
-
-        cout << "Deleted: " << arr[front] << endl;
-
-        if (front == rear) {
-            // Queue has only one element
-            front = -1;
-            rear = -1;
-        } else {
-            front = (front + 1) % SIZE;  // Circular increment
-        }
+        cout << arr[front] << " deleted\n";
+        if (front == rear) front = rear = -1; 
+        else front = (front + 1) % SIZE;
     }
 
-    // Display all elements in the queue
     void display() {
-        if (isEmpty()) {
-            cout << "Queue is EMPTY!" << endl;
-            return;
-        }
-
-        cout << "Queue elements: ";
+        if (front == -1) { cout << "Queue is empty\n"; return; }
+        cout << "Queue: ";
         int i = front;
-
         while (true) {
             cout << arr[i] << " ";
-            if (i == rear)
-                break;
+            if (i == rear) break;
             i = (i + 1) % SIZE;
         }
         cout << endl;
     }
 };
 
-
-// Main Function
 int main() {
     CircularQueue q;
-    int choice, value;
-
-    do {
-        cout << "\n--- Circular Queue Menu ---\n";
-        cout << "1. Enqueue (Insert)\n";
-        cout << "2. Dequeue (Delete)\n";
-        cout << "3. Display\n";
-        cout << "4. Exit\n";
-        cout << "Enter choice: ";
-        cin >> choice;
-
-        switch (choice) {
-            case 1:
-                cout << "Enter value to insert: ";
-                cin >> value;
-                q.enqueue(value);
-                break;
-
-            case 2:
-                q.dequeue();
-                break;
-
-            case 3:
-                q.display();
-                break;
-
-            case 4:
-                cout << "Exiting program..." << endl;
-                break;
-
-            default:
-                cout << "Invalid choice! Try again." << endl;
-        }
-    } while (choice != 4);
-
-    return 0;
+    q.enqueue(10);
+    q.enqueue(20);
+    q.enqueue(30);
+    q.display();
+    q.dequeue();
+    q.display();
+    q.enqueue(40);
+    q.enqueue(50);
+    q.enqueue(60); // Overflow
+    q.display();
 }
