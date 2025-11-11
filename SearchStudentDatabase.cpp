@@ -1,122 +1,72 @@
 #include <iostream>
-#include <cstring>  // for strcmp
-#include <cstdlib>  // for malloc, realloc, free
+#include <cstring>
+#include <cstdlib>
 using namespace std;
 
-// Structure to store student details
 struct Student {
     int id;
     char name[50];
     float cgpa;
 };
 
-// Function to add a new student
-void addStudent(Student*& students, int& size) {
-    students = (Student*)realloc(students, (size + 1) * sizeof(Student));  // expand memory
-    
-    cout << "\nEnter Student ID: ";
-    cin >> students[size].id;
-    cout << "Enter Student Name: ";
+void addStudent(Student*& s, int& n) {
+    s = (Student*)realloc(s, (n + 1) * sizeof(Student));
+    cout << "\nEnter Student ID: "; cin >> s[n].id;
     cin.ignore();
-    cin.getline(students[size].name, 50);
-    cout << "Enter Student CGPA: ";
-    cin >> students[size].cgpa;
-
-    size++;
-    cout << "Student added successfully!\n";
+    cout << "Enter Student Name: "; cin.getline(s[n].name, 50);
+    cout << "Enter Student CGPA: "; cin >> s[n].cgpa;
+    n++; cout << "Student added successfully!\n";
 }
 
-// Function to display all students
-void displayStudents(Student* students, int size) {
+void displayStudents(Student* s, int n) {
     cout << "\n--- Student Records ---\n";
-    for (int i = 0; i < size; i++) {
-        cout << "ID: " << students[i].id
-             << " | Name: " << students[i].name
-             << " | CGPA: " << students[i].cgpa << endl;
-    }
+    for(int i=0;i<n;i++)
+        cout << "ID: " << s[i].id << " | Name: " << s[i].name << " | CGPA: " << s[i].cgpa << endl;
 }
 
-// Linear Search by ID
-void linearSearch(Student* students, int size, int id) {
-    for (int i = 0; i < size; i++) {
-        if (students[i].id == id) {
+void linearSearch(Student* s, int n, int id) {
+    for(int i=0;i<n;i++)
+        if(s[i].id==id) {
             cout << "\nRecord Found (Linear Search):\n";
-            cout << "ID: " << students[i].id << " | Name: " << students[i].name << " | CGPA: " << students[i].cgpa << endl;
+            cout << "ID: " << s[i].id << " | Name: " << s[i].name << " | CGPA: " << s[i].cgpa << endl;
             return;
         }
-    }
     cout << "\nRecord not found (Linear Search).\n";
 }
 
-// Sort Students by ID (for Binary Search)
-void sortStudents(Student* students, int size) {
-    for (int i = 0; i < size - 1; i++) {
-        for (int j = 0; j < size - i - 1; j++) {
-            if (students[j].id > students[j + 1].id) {
-                Student temp = students[j];
-                students[j] = students[j + 1];
-                students[j + 1] = temp;
-            }
-        }
-    }
+void sortStudents(Student* s, int n) {
+    for(int i=0;i<n-1;i++)
+        for(int j=0;j<n-i-1;j++)
+            if(s[j].id > s[j+1].id) swap(s[j], s[j+1]);
 }
 
-// Binary Search by ID
-void binarySearch(Student* students, int size, int id) {
-    int low = 0, high = size - 1;
-    while (low <= high) {
-        int mid = (low + high) / 2;
-        if (students[mid].id == id) {
+void binarySearch(Student* s, int n, int id) {
+    int l=0,h=n-1;
+    while(l<=h) {
+        int m=(l+h)/2;
+        if(s[m].id==id) {
             cout << "\nRecord Found (Binary Search):\n";
-            cout << "ID: " << students[mid].id << " | Name: " << students[mid].name << " | CGPA: " << students[mid].cgpa << endl;
+            cout << "ID: " << s[m].id << " | Name: " << s[m].name << " | CGPA: " << s[m].cgpa << endl;
             return;
-        } else if (students[mid].id < id)
-            low = mid + 1;
-        else
-            high = mid - 1;
+        }
+        else if(s[m].id<id) l=m+1;
+        else h=m-1;
     }
     cout << "\nRecord not found (Binary Search).\n";
 }
 
-// Main Function
 int main() {
-    Student* students = NULL;
-    int size = 0, choice, id;
-
-    while (true) {
-        cout << "\n--- MENU ---";
-        cout << "\n1. Add Student";
-        cout << "\n2. Display All Students";
-        cout << "\n3. Linear Search by ID";
-        cout << "\n4. Binary Search by ID";
-        cout << "\n5. Exit";
-        cout << "\nEnter your choice: ";
+    Student* s=NULL; int n=0,choice,id;
+    while(true) {
+        cout << "\n--- MENU ---\n1.Add Student\n2.Display All\n3.Linear Search\n4.Binary Search\n5.Exit\nChoice: ";
         cin >> choice;
-
-        switch (choice) {
-            case 1:
-                addStudent(students, size);
-                break;
-            case 2:
-                displayStudents(students, size);
-                break;
-            case 3:
-                cout << "Enter ID to search: ";
-                cin >> id;
-                linearSearch(students, size, id);
-                break;
-            case 4:
-                sortStudents(students, size); // sort before binary search
-                cout << "Enter ID to search: ";
-                cin >> id;
-                binarySearch(students, size, id);
-                break;
-            case 5:
-                free(students);
-                cout << "Exiting...";
-                return 0;
-            default:
-                cout << "Invalid choice!";
+        switch(choice) {
+            case 1: addStudent(s,n); break;
+            case 2: displayStudents(s,n); break;
+            case 3: cout<<"Enter ID: "; cin>>id; linearSearch(s,n,id); break;
+            case 4: sortStudents(s,n); cout<<"Enter ID: "; cin>>id; binarySearch(s,n,id); break;
+            case 5: free(s); cout<<"Exiting..."; return 0;
+            default: cout<<"Invalid choice!";
         }
     }
 }
