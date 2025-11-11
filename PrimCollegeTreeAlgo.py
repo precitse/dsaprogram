@@ -1,67 +1,49 @@
-import sys
+#include <iostream>
+using namespace std;
 
-class Graph:
-    def __init__(self, vertices):
-        self.V = vertices
-        self.graph = [[0 for _ in range(vertices)] for _ in range(vertices)]  # Adjacency Matrix
+#define INF 9999  // large number representing infinity
+#define MAX 10    // maximum number of vertices
 
-    # Print the MST
-    def print_mst(self, parent):
-        print("\nEdges in the Minimum Spanning Tree (Prim’s Algorithm):")
-        total_cost = 0
-        for i in range(1, self.V):
-            if parent[i] is not None and parent[i] != -1:
-                print(f"{parent[i]} -- {i} == {self.graph[i][parent[i]]}")
-                total_cost += self.graph[i][parent[i]]
-        print("Minimum Spanning Tree Cost:", total_cost)
+int main() {
+    int n; // number of vertices
+    cout << "Enter number of departments (vertices): ";
+    cin >> n;
 
-    # Find vertex with minimum key value
-    def min_key(self, key, mstSet):
-        min_val = sys.maxsize
-        min_index = -1
-        for v in range(self.V):
-            if key[v] < min_val and not mstSet[v]:
-                min_val = key[v]
-                min_index = v
-        return min_index
+    int cost[MAX][MAX];
+    cout << "Enter adjacency matrix (use 0 if no direct path):\n";
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) {
+            cin >> cost[i][j];
+            if (cost[i][j] == 0)
+                cost[i][j] = INF;
+        }
 
-    # Prim’s Algorithm
-    def prim_mst(self):
-        key = [sys.maxsize] * self.V
-        parent = [None] * self.V
-        key[0] = 0
-        parent[0] = -1
-        mstSet = [False] * self.V
+    int visited[MAX] = {0};
+    visited[0] = 1; // start from first node
+    int edges = 0, mincost = 0;
 
-        for _ in range(self.V):
-            u = self.min_key(key, mstSet)
-            if u == -1:  # No valid vertex left (disconnected graph)
-                break
-            mstSet[u] = True
+    cout << "\nEdges in Minimum Spanning Tree:\n";
+    while (edges < n - 1) {
+        int min = INF, a = -1, b = -1;
 
-            for v in range(self.V):
-                if self.graph[u][v] > 0 and not mstSet[v] and key[v] > self.graph[u][v]:
-                    key[v] = self.graph[u][v]
-                    parent[v] = u
+        for (int i = 0; i < n; i++)
+            if (visited[i])
+                for (int j = 0; j < n; j++)
+                    if (!visited[j] && cost[i][j] < min) {
+                        min = cost[i][j];
+                        a = i;
+                        b = j;
+                    }
 
-        self.print_mst(parent)
+        if (a != -1 && b != -1) {
+            cout << "Department " << a + 1 << " --> Department " << b + 1
+                 << "  Distance: " << min << endl;
+            mincost += min;
+            visited[b] = 1;
+            edges++;
+        }
+    }
 
-
-# ----------------- Main Program -----------------
-if __name__ == "__main__":
-
-    # Example: 5 departments
-    # 0 = Main Gate, 1 = CS Dept, 2 = IT Dept, 3 = Library, 4 = Hostel
-    g = Graph(5)
-
-    # Fill adjacency matrix with distances
-    g.graph = [
-        [0, 10, 8, 0, 0],   # Main Gate
-        [10, 0, 5, 3, 0],   # CS Dept
-        [8, 5, 0, 7, 6],    # IT Dept
-        [0, 3, 7, 0, 4],    # Library
-        [0, 0, 6, 4, 0]     # Hostel
-    ]
-
-    # Run Prim’s Algorithm
-    g.prim_mst()
+    cout << "\nMinimum cost of campus connection = " << mincost << endl;
+    return 0;
+}
