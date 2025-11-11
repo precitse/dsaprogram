@@ -1,135 +1,64 @@
 #include <iostream>
-#include <cstring>
-#include <cctype>
 #include <algorithm>
 using namespace std;
 
-// =====================
-// Stack Implementation using Linked List
-// =====================
-class Node {
-public:
+struct Node {
     char data;
     Node* next;
-    Node(char d) {
-        data = d;
-        next = NULL;
-    }
-};
+} *top = NULL;
 
-class Stack {
-    Node* top;
-public:
-    Stack() {
-        top = NULL;
-    }
-
-    void push(char x) {
-        Node* temp = new Node(x);
-        temp->next = top;
-        top = temp;
-    }
-
-    char pop() {
-        if (isEmpty()) return '\0';
-        Node* temp = top;
-        char val = temp->data;
-        top = top->next;
-        delete temp;
-        return val;
-    }
-
-    char peek() {
-        if (isEmpty()) return '\0';
-        return top->data;
-    }
-
-    bool isEmpty() {
-        return top == NULL;
-    }
-};
-
-// =====================
-// Helper Functions
-// =====================
-int precedence(char c) {
-    if (c == '^') return 3;
-    else if (c == '*' || c == '/') return 2;
-    else if (c == '+' || c == '-') return 1;
-    else return -1;
+void push(char x) {
+    Node* t = new Node;
+    t->data = x;
+    t->next = top;
+    top = t;
 }
-
-bool isOperator(char c) {
-    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '^');
+char pop() {
+    if (!top) return '\0';
+    char x = top->data;
+    Node* t = top;
+    top = top->next;
+    delete t;
+    return x;
 }
-
-// =====================
-// INFIX → POSTFIX
-// =====================
-string infixToPostfix(string infix) {
-    Stack s;
-    string postfix = "";
-    
-    for (int i = 0; i < infix.length(); i++) {
-        char ch = infix[i];
-        
-        // If operand, add to result
-        if (isalnum(ch))
-            postfix += ch;
-        
-        // If '(', push to stack
-        else if (ch == '(')
-            s.push(ch);
-        
-        // If ')', pop until '('
-        else if (ch == ')') {
-            while (!s.isEmpty() && s.peek() != '(')
-                postfix += s.pop();
-            s.pop(); // remove '('
-        }
-        
-        // If operator
-        else if (isOperator(ch)) {
-            while (!s.isEmpty() && precedence(s.peek()) >= precedence(ch))
-                postfix += s.pop();
-            s.push(ch);
-        }
-    }
-    
-    // Pop all remaining operators
-    while (!s.isEmpty())
-        postfix += s.pop();
-    
-    return postfix;
-}
-
-// =====================
-// INFIX → PREFIX
-// =====================
-string infixToPrefix(string infix) {
-    reverse(infix.begin(), infix.end());
-    
-    // Swap '(' with ')' after reversing
-    for (int i = 0; i < infix.length(); i++) {
-        if (infix[i] == '(') infix[i] = ')';
-        else if (infix[i] == ')') infix[i] = '(';
-    }
-
-    string postfix = infixToPostfix(infix);
-    reverse(postfix.begin(), postfix.end());
-    return postfix;
-}
-
-// =====================
-// MAIN FUNCTION
-// =====================
-int main() {
-    string infix;
-    cout << "Enter infix expression: ";
-    cin >> infix;
-
-    cout << "\nPostfix Expression: " << infixToPostfix(infix);
-    cout << "\nPrefix Expression : " << infixToPrefix(infix);
-
+int prec(char c) {
+    if (c == '+' || c == '-') return 1;
+    if (c == '*' || c == '/') return 2;
     return 0;
 }
+
+string infixToPostfix(string exp) {
+    string out = "";
+    for (char c : exp) {
+        if (isalnum(c)) out += c;
+        else if (c == '(') push(c);
+        else if (c == ')') {
+            while (top && top->data != '(') out += pop();
+            pop();
+        } else {
+            while (top && prec(top->data) >= prec(c)) out += pop();
+            push(c);
+        }
+    }
+    while (top) out += pop();
+    return out;
+}
+
+string infixToPrefix(string exp) {
+    reverse(exp.begin(), exp.end());
+    for (char &c : exp) {
+        if (c == '(') c = ')';
+        else if (c == ')') c = '(';
+    }
+    string post = infixToPostfix(exp);
+    reverse(post.begin(), post.end());
+    return post;
+}
+
+int main() {
+    string infix;
+    cout << "Enter infix: ";
+    cin >> infix;
+    cout << "Postfix: " << infixToPostfix(infix) << endl;
+    cout << "Prefix: " << infixToPrefix(infix);
+}2+3*5-4
